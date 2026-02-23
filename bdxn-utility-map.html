@@ -1,0 +1,358 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>BDXN Token Utility Map; Bondex</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,wght@0,400;0,500;0,700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{
+  --bg:#0a0e1a;--bg2:#0f1424;--bg3:#141a2e;
+  --tx:#e2e8f0;--tx2:#94a3b8;--tx3:#64748b;
+  --core:#0dd4a0;--core-dim:rgba(13,212,160,.12);
+  --ent:#f59e0b;--ent-dim:rgba(245,158,11,.10);
+  --usr:#3b82f6;--usr-dim:rgba(59,130,246,.10);
+  --pyr-core:#0dd4a0;--pyr-exp:#f59e0b;--pyr-fut:#a855f7;
+  --pyr-fut-dim:rgba(168,85,247,.08);
+  --lo:#22c55e;--lo-dim:rgba(34,197,94,.12);
+  --md:#f59e0b;--md-dim:rgba(245,158,11,.12);
+  --hi:#ef4444;--hi-dim:rgba(239,68,68,.12);
+  --rad:12px;--rad-sm:8px;
+}
+html{scroll-behavior:smooth}
+body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--tx);line-height:1.6;overflow-x:hidden}
+.mono{font-family:'Space Mono',monospace}
+body::before{content:'';position:fixed;inset:0;opacity:.03;pointer-events:none;z-index:9999;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E")}
+.wrap{max-width:1200px;margin:0 auto;padding:0 24px}
+.hero{text-align:center;padding:80px 24px 40px;position:relative}
+.hero::after{content:'';position:absolute;top:0;left:50%;transform:translateX(-50%);width:600px;height:600px;background:radial-gradient(circle,rgba(13,212,160,.06) 0%,transparent 70%);pointer-events:none}
+.logo{font-size:13px;letter-spacing:4px;text-transform:uppercase;color:var(--core);font-weight:700;margin-bottom:12px}
+.hero h1{font-size:clamp(28px,5vw,48px);font-weight:700;line-height:1.15;margin-bottom:16px;background:linear-gradient(135deg,#fff 0%,var(--core) 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.hero p{color:var(--tx2);font-size:clamp(14px,2vw,17px);max-width:640px;margin:0 auto 8px}
+.hero .sub{font-size:13px;color:var(--tx3);margin-top:20px}
+.hero .sub span{color:var(--core);font-weight:600}
+.sec{padding:60px 0 20px}
+.sec-label{font-size:11px;letter-spacing:3px;text-transform:uppercase;font-weight:700;margin-bottom:8px}
+.sec-title{font-size:clamp(22px,3.5vw,32px);font-weight:700;margin-bottom:6px}
+.sec-sub{color:var(--tx3);font-size:14px;margin-bottom:32px}
+.sec-divider{width:48px;height:2px;margin:0 0 32px;border-radius:1px}
+
+/* CORE 10; minimal */
+.core-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:8px;margin-bottom:24px}
+.core-card{background:var(--bg2);border:1px solid rgba(13,212,160,.08);border-radius:var(--rad);padding:12px 16px;cursor:pointer;transition:all .3s ease;position:relative;overflow:hidden}
+.core-card::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:var(--core);opacity:0;transition:opacity .3s}
+.core-card:hover{border-color:rgba(13,212,160,.22);transform:translateY(-1px);box-shadow:0 4px 16px rgba(13,212,160,.05)}
+.core-card:hover::before,.core-card.open::before{opacity:1}
+.core-card.open{border-color:rgba(13,212,160,.3)}
+.core-head{display:flex;align-items:center;gap:10px}
+.core-num{font-family:'Space Mono',monospace;font-size:10px;color:var(--core);opacity:.45;flex-shrink:0}
+.core-name{font-size:13px;font-weight:600;flex:1}
+.core-tag{font-size:8px;letter-spacing:.8px;text-transform:uppercase;padding:2px 6px;border-radius:3px;background:var(--core-dim);color:var(--core);font-weight:600;flex-shrink:0}
+.core-arrow{color:var(--tx3);font-size:10px;transition:transform .3s;flex-shrink:0}
+.core-card.open .core-arrow{transform:rotate(180deg);color:var(--core)}
+.core-detail{max-height:0;overflow:hidden;transition:max-height .45s ease}
+.core-card.open .core-detail{max-height:500px}
+.core-detail-inner{border-top:1px solid rgba(255,255,255,.05);margin-top:10px;padding-top:12px;font-size:12.5px;color:var(--tx2);line-height:1.65}
+.core-detail-inner strong{color:var(--tx);font-weight:600}
+.eng-row{display:flex;flex-wrap:wrap;gap:5px;margin-top:12px;padding-top:10px;border-top:1px solid rgba(255,255,255,.04)}
+.eng-badge{display:inline-flex;align-items:center;gap:4px;font-size:9px;font-weight:600;padding:3px 8px;border-radius:4px;font-family:'Space Mono',monospace;letter-spacing:.3px}
+.eng-badge .dot{width:4px;height:4px;border-radius:50%}
+.badge-lo{background:var(--lo-dim);color:var(--lo)}.badge-lo .dot{background:var(--lo)}
+.badge-md{background:var(--md-dim);color:var(--md)}.badge-md .dot{background:var(--md)}
+.badge-hi{background:var(--hi-dim);color:var(--hi)}.badge-hi .dot{background:var(--hi)}
+.badge-time{background:rgba(255,255,255,.05);color:var(--tx2)}
+.eng-note{font-size:11px;color:var(--tx3);margin-top:8px;line-height:1.5;font-style:italic}
+
+/* 43 UTILITIES; minimal */
+.util-section{padding:60px 0 20px}
+.util-columns{display:grid;grid-template-columns:1fr 1fr;gap:32px}
+@media(max-width:768px){.util-columns{grid-template-columns:1fr}}
+.util-col-header{display:flex;align-items:center;gap:10px;margin-bottom:14px;padding-bottom:10px;border-bottom:1px solid rgba(255,255,255,.05)}
+.util-col-icon{width:28px;height:28px;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700}
+.util-col-title{font-size:14px;font-weight:700}
+.util-col-count{font-size:10px;color:var(--tx3);font-family:'Space Mono',monospace}
+.util-card{background:var(--bg2);border:1px solid rgba(255,255,255,.04);border-radius:var(--rad-sm);margin-bottom:4px;cursor:pointer;transition:all .25s ease;overflow:hidden}
+.util-card:hover{border-color:rgba(255,255,255,.10)}
+.util-card.ent-card:hover{border-color:rgba(245,158,11,.18)}
+.util-card.usr-card:hover{border-color:rgba(59,130,246,.18)}
+.util-card.open.ent-card{border-color:rgba(245,158,11,.25);background:linear-gradient(135deg,var(--bg2),rgba(245,158,11,.02))}
+.util-card.open.usr-card{border-color:rgba(59,130,246,.25);background:linear-gradient(135deg,var(--bg2),rgba(59,130,246,.02))}
+.util-head{padding:10px 12px;display:flex;align-items:center;gap:8px}
+.util-dot{width:4px;height:4px;border-radius:50%;flex-shrink:0}
+.ent-card .util-dot{background:var(--ent)}.usr-card .util-dot{background:var(--usr)}
+.util-name{font-size:12px;font-weight:600;flex:1}
+.util-arrow{color:var(--tx3);font-size:9px;transition:transform .3s;flex-shrink:0}
+.util-card.open .util-arrow{transform:rotate(180deg)}
+.util-body{max-height:0;overflow:hidden;transition:max-height .35s ease}
+.util-card.open .util-body{max-height:300px}
+.util-body-inner{font-size:11.5px;color:var(--tx2);line-height:1.6;border-top:1px solid rgba(255,255,255,.04);margin:0 12px;padding:8px 0 10px}
+.util-tier{display:inline-block;font-size:8px;padding:1px 5px;border-radius:3px;font-weight:600;letter-spacing:.5px;text-transform:uppercase;flex-shrink:0}
+.tier-core{background:var(--core-dim);color:var(--core)}
+.tier-exp{background:var(--ent-dim);color:var(--ent)}
+.tier-fut{background:var(--pyr-fut-dim);color:var(--pyr-fut)}
+
+/* CALLOUT */
+.problem-box{background:linear-gradient(135deg,var(--bg2),var(--bg3));border:1px solid rgba(255,255,255,.06);border-radius:var(--rad);padding:24px 28px;margin:0 0 48px;position:relative;overflow:hidden}
+.problem-box::before{content:'';position:absolute;top:0;left:0;bottom:0;width:3px;background:var(--core)}
+.problem-box .pb-label{font-size:11px;letter-spacing:2px;text-transform:uppercase;color:var(--core);font-weight:700;margin-bottom:10px}
+.problem-box p{font-size:14px;color:var(--tx);line-height:1.7}
+.problem-box p span{color:var(--core);font-weight:600}
+
+/* PYRAMID */
+.pyramid-section{padding:60px 0 80px}
+.pyramid-wrap{display:flex;flex-direction:column;align-items:center;margin-bottom:40px}
+.pyramid-svg-wrap{width:100%;max-width:560px;cursor:pointer}
+.pyramid-svg-wrap svg{width:100%;height:auto}
+.pyr-layer{opacity:.85;transition:all .3s;cursor:pointer}
+.pyr-layer:hover{opacity:1;filter:brightness(1.2)}
+.pyr-label{font-family:'DM Sans',sans-serif;font-weight:700;pointer-events:none}
+.pyr-sublabel{font-family:'DM Sans',sans-serif;font-weight:400;pointer-events:none;opacity:.7}
+.pyramid-hint{text-align:center;color:var(--tx3);font-size:12px;margin-top:14px}
+.pyr-panels{display:grid;grid-template-columns:1fr;gap:10px;max-width:800px;margin:0 auto}
+.pyr-panel{background:var(--bg2);border-radius:var(--rad);overflow:hidden;border:1px solid rgba(255,255,255,.04);cursor:pointer;transition:all .3s}
+.pyr-panel:hover{border-color:rgba(255,255,255,.10)}
+.pyr-panel.open{border-color:rgba(255,255,255,.12)}
+.pyr-panel-head{padding:12px 18px;display:flex;align-items:center;gap:10px}
+.pyr-panel-dot{width:7px;height:7px;border-radius:50%;flex-shrink:0}
+.pyr-panel-info{flex:1}
+.pyr-panel-title{font-size:13px;font-weight:700}
+.pyr-panel-sub{font-size:11px;color:var(--tx3);margin-top:1px}
+.pyr-panel-arrow{color:var(--tx3);font-size:10px;transition:transform .3s}
+.pyr-panel.open .pyr-panel-arrow{transform:rotate(180deg)}
+.pyr-panel-body{max-height:0;overflow:hidden;transition:max-height .4s ease}
+.pyr-panel.open .pyr-panel-body{max-height:600px}
+.pyr-panel-body-inner{padding:0 18px 16px}
+.pyr-theme{margin-bottom:10px}
+.pyr-theme-label{font-size:9px;font-weight:700;letter-spacing:1px;text-transform:uppercase;margin-bottom:5px}
+.pyr-theme-items{display:flex;flex-wrap:wrap;gap:4px}
+.pyr-item{font-size:11px;padding:3px 9px;border-radius:4px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.05);color:var(--tx2)}
+
+/* SUCCESS */
+.success-section{padding:40px 0 80px}
+.success-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:10px}
+.success-card{background:var(--bg2);border:1px solid rgba(13,212,160,.06);border-radius:var(--rad);padding:20px;text-align:center;transition:all .3s}
+.success-card:hover{border-color:rgba(13,212,160,.18);transform:translateY(-1px)}
+.success-icon{font-size:22px;margin-bottom:8px}
+.success-text{font-size:13px;color:var(--tx);font-weight:500;line-height:1.5}
+
+.footer{text-align:center;padding:40px 24px;border-top:1px solid rgba(255,255,255,.04);color:var(--tx3);font-size:12px}
+.footer a{color:var(--core);text-decoration:none}
+.footer .tagline{font-size:14px;font-weight:600;color:var(--tx2);margin-bottom:8px}
+
+@keyframes fadeUp{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
+.fade-up{animation:fadeUp .6s ease both}.d1{animation-delay:.1s}.d2{animation-delay:.2s}.d3{animation-delay:.3s}
+@media(max-width:640px){.core-grid{grid-template-columns:1fr}.success-grid{grid-template-columns:1fr 1fr}.hero{padding:60px 20px 30px}.problem-box{padding:20px 24px}.bp-grid{grid-template-columns:1fr !important}}
+</style>
+</head>
+<body>
+
+<header class="hero">
+  <div class="logo fade-up">Bondex</div>
+  <h1 class="fade-up d1">BDXN Token Utility Map</h1>
+  <p class="fade-up d2">Bondex is designing a trust economy for hiring.<br>This is how BDXN powers it.</p>
+  <p class="sub fade-up d3">The full analysis identified <span>43 utilities</span>. Individually sound; collectively unfocused.<br>Strategy requires a center of gravity; the <span>Core 10</span>.</p>
+</header>
+
+<section class="sec">
+  <div class="wrap">
+    <div class="sec-label" style="color:var(--core)">Foundation</div>
+    <div class="sec-title">The Core 10 Utilities</div>
+    <div class="sec-sub">The irreducible set. Every utility here directly drives trust, hiring activity, or token demand.</div>
+    <div class="sec-divider" style="background:var(--core)"></div>
+    <div class="core-grid" id="coreGrid"></div>
+  </div>
+</section>
+
+<section><div class="wrap">
+  <div class="problem-box">
+    <div class="pb-label">Economic Model; Demand Forces</div>
+    <p>Three structural forces create sustained token demand beyond speculation:<br><br>
+      <span>Operational Spend</span>; enterprises pay BDXN for job listings, ATS access, and premium placement. Recurring budget-line spend.<br><br>
+      <span>Lockups</span>; staking for reputation tiers, governance participation, and revenue-share eligibility removes circulating supply.<br><br>
+      <span>Trust Collateral</span>; both sides of the market lock BDXN to signal credibility. The token exists because trust needs collateral.</p>
+  </div>
+</div></section>
+
+<section><div class="wrap" style="margin-bottom:48px">
+  <div class="problem-box" style="border-left-color:transparent">
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:32px" class="bp-grid">
+      <div>
+        <div class="pb-label" style="color:var(--usr)">Bond Points</div>
+        <p style="font-size:13px;color:var(--tx2)">Off-chain reputation score. Earned through profile completeness, verifications, referrals, and professional contributions. Non-transferable. <strong style="color:var(--tx)">Measures behavior.</strong></p>
+      </div>
+      <div>
+        <div class="pb-label" style="color:var(--ent)">BDXN Token</div>
+        <p style="font-size:13px;color:var(--tx2)">On-chain economic asset. Used for hiring fees, staking, governance, premium access, and trust collateral. Transferable and tradeable. <strong style="color:var(--tx)">Captures value.</strong></p>
+      </div>
+    </div>
+  </div>
+</div></section>
+
+<section class="util-section"><div class="wrap">
+  <div class="sec-label" style="color:var(--tx3)">Complete Landscape</div>
+  <div class="sec-title">All 43 Utilities</div>
+  <div class="sec-sub">Enterprise-side and user-side token utilities. Core 10 tagged.</div>
+  <div class="sec-divider" style="background:var(--tx3)"></div>
+  <div class="util-columns">
+    <div>
+      <div class="util-col-header">
+        <div class="util-col-icon" style="background:var(--ent-dim);color:var(--ent)">E</div>
+        <div><div class="util-col-title" style="color:var(--ent)">Enterprise Side</div><div class="util-col-count">22 utilities</div></div>
+      </div>
+      <div id="entList"></div>
+    </div>
+    <div>
+      <div class="util-col-header">
+        <div class="util-col-icon" style="background:var(--usr-dim);color:var(--usr)">U</div>
+        <div><div class="util-col-title" style="color:var(--usr)">User / Talent Side</div><div class="util-col-count">21 utilities</div></div>
+      </div>
+      <div id="usrList"></div>
+    </div>
+  </div>
+</div></section>
+
+<section class="pyramid-section"><div class="wrap">
+  <div class="sec-label" style="color:var(--pyr-fut)">Sequencing</div>
+  <div class="sec-title">The Utility Pyramid</div>
+  <div class="sec-sub">Core, then Expansion, then Future. Focus first; scale second; dream third.</div>
+  <div class="sec-divider" style="background:var(--pyr-fut)"></div>
+  <div class="pyramid-wrap">
+    <div class="pyramid-svg-wrap">
+      <svg viewBox="0 0 600 380" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <g class="pyr-layer" onclick="togglePanel('fut')"><path d="M300 20 L420 140 L180 140 Z" fill="rgba(168,85,247,.12)" stroke="rgba(168,85,247,.4)" stroke-width="1.5"/><text x="300" y="90" text-anchor="middle" fill="#a855f7" font-size="14" class="pyr-label">FUTURE</text><text x="300" y="110" text-anchor="middle" fill="#a855f7" font-size="10" class="pyr-sublabel">Ecosystem Vision</text></g>
+        <g class="pyr-layer" onclick="togglePanel('exp')"><path d="M180 150 L420 150 L480 260 L120 260 Z" fill="rgba(245,158,11,.10)" stroke="rgba(245,158,11,.35)" stroke-width="1.5"/><text x="300" y="200" text-anchor="middle" fill="#f59e0b" font-size="14" class="pyr-label">EXPANSION</text><text x="300" y="220" text-anchor="middle" fill="#f59e0b" font-size="10" class="pyr-sublabel">Growth &amp; Monetization</text></g>
+        <g class="pyr-layer" onclick="togglePanel('core')"><path d="M120 270 L480 270 L540 360 L60 360 Z" fill="rgba(13,212,160,.10)" stroke="rgba(13,212,160,.35)" stroke-width="1.5"/><text x="300" y="310" text-anchor="middle" fill="#0dd4a0" font-size="15" class="pyr-label">CORE 10</text><text x="300" y="332" text-anchor="middle" fill="#0dd4a0" font-size="10" class="pyr-sublabel">Trust Infrastructure</text></g>
+      </svg>
+    </div>
+    <div class="pyramid-hint">Click any layer or expand below</div>
+  </div>
+  <div class="pyr-panels">
+    <div class="pyr-panel" id="panel-core" onclick="togglePanel('core')">
+      <div class="pyr-panel-head"><div class="pyr-panel-dot" style="background:var(--pyr-core)"></div><div class="pyr-panel-info"><div class="pyr-panel-title" style="color:var(--pyr-core)">Core 10; Trust Infrastructure</div><div class="pyr-panel-sub">Ship now. These make the token real.</div></div><div class="pyr-panel-arrow">▼</div></div>
+      <div class="pyr-panel-body"><div class="pyr-panel-body-inner">
+        <div class="pyr-theme"><div class="pyr-theme-label" style="color:var(--pyr-core)">Hiring Revenue</div><div class="pyr-theme-items"><span class="pyr-item">Hiring Fees</span><span class="pyr-item">Job Listing Payments</span><span class="pyr-item">ATS Subscription</span></div></div>
+        <div class="pyr-theme"><div class="pyr-theme-label" style="color:var(--pyr-core)">Trust Mechanics</div><div class="pyr-theme-items"><span class="pyr-item">Reputation Staking</span><span class="pyr-item">Verification Fees</span><span class="pyr-item">Trust Collateral</span></div></div>
+        <div class="pyr-theme"><div class="pyr-theme-label" style="color:var(--pyr-core)">Economic Foundation</div><div class="pyr-theme-items"><span class="pyr-item">Revenue Sharing</span><span class="pyr-item">Referral Bounties</span><span class="pyr-item">Governance Voting</span><span class="pyr-item">Premium Access</span></div></div>
+      </div></div>
+    </div>
+    <div class="pyr-panel" id="panel-exp" onclick="togglePanel('exp')">
+      <div class="pyr-panel-head"><div class="pyr-panel-dot" style="background:var(--pyr-exp)"></div><div class="pyr-panel-info"><div class="pyr-panel-title" style="color:var(--pyr-exp)">Expansion; Growth & Monetization</div><div class="pyr-panel-sub">Build after Core is live and generating demand.</div></div><div class="pyr-panel-arrow">▼</div></div>
+      <div class="pyr-panel-body"><div class="pyr-panel-body-inner">
+        <div class="pyr-theme"><div class="pyr-theme-label" style="color:var(--pyr-exp)">Reputation Extensions</div><div class="pyr-theme-items"><span class="pyr-item">Endorsement Staking</span><span class="pyr-item">Skill Verification Badges</span><span class="pyr-item">Credential NFTs</span><span class="pyr-item">Cross-Platform Reputation</span><span class="pyr-item">Professional Score Tiers</span></div></div>
+        <div class="pyr-theme"><div class="pyr-theme-label" style="color:var(--pyr-exp)">Growth Mechanics</div><div class="pyr-theme-items"><span class="pyr-item">Referral Network Bonuses</span><span class="pyr-item">Community Challenges</span><span class="pyr-item">Seasonal Campaigns</span><span class="pyr-item">Ambassador Programs</span><span class="pyr-item">Content Creator Rewards</span></div></div>
+        <div class="pyr-theme"><div class="pyr-theme-label" style="color:var(--pyr-exp)">Enterprise Monetization</div><div class="pyr-theme-items"><span class="pyr-item">Talent Pool Analytics</span><span class="pyr-item">Bulk Hiring Packages</span><span class="pyr-item">API Access Tiers</span><span class="pyr-item">White-Label Recruiting</span><span class="pyr-item">Priority Candidate Access</span></div></div>
+        <div class="pyr-theme"><div class="pyr-theme-label" style="color:var(--pyr-exp)">Governance</div><div class="pyr-theme-items"><span class="pyr-item">Proposal Submission</span><span class="pyr-item">Treasury Allocation Votes</span><span class="pyr-item">Feature Prioritization</span><span class="pyr-item">Dispute Resolution</span></div></div>
+      </div></div>
+    </div>
+    <div class="pyr-panel" id="panel-fut" onclick="togglePanel('fut')">
+      <div class="pyr-panel-head"><div class="pyr-panel-dot" style="background:var(--pyr-fut)"></div><div class="pyr-panel-info"><div class="pyr-panel-title" style="color:var(--pyr-fut)">Future; Ecosystem Vision</div><div class="pyr-panel-sub">Only viable once trust infrastructure is established.</div></div><div class="pyr-panel-arrow">▼</div></div>
+      <div class="pyr-panel-body"><div class="pyr-panel-body-inner">
+        <div class="pyr-theme"><div class="pyr-theme-label" style="color:var(--pyr-fut)">Trust Layer for Talent</div><div class="pyr-theme-items"><span class="pyr-item">Cross-Chain Identity</span><span class="pyr-item">ZK-Verified Credentials</span><span class="pyr-item">Privacy-Preserving Hiring</span><span class="pyr-item">Decentralized Reputation Protocol</span></div></div>
+        <div class="pyr-theme"><div class="pyr-theme-label" style="color:var(--pyr-fut)">Economic Expansion</div><div class="pyr-theme-items"><span class="pyr-item">Freelance Escrow</span><span class="pyr-item">Insurance Pools</span><span class="pyr-item">Salary Streaming</span><span class="pyr-item">Token-Gated Communities</span></div></div>
+        <div class="pyr-theme"><div class="pyr-theme-label" style="color:var(--pyr-fut)">Platform Network Effects</div><div class="pyr-theme-items"><span class="pyr-item">Third-Party Integrations</span><span class="pyr-item">Reputation-as-a-Service API</span><span class="pyr-item">Interoperable Professional Graph</span><span class="pyr-item">DAO-Native Hiring</span></div></div>
+      </div></div>
+    </div>
+  </div>
+</div></section>
+
+<section class="success-section"><div class="wrap">
+  <div class="sec-label" style="color:var(--core)">Strategic Outcome</div>
+  <div class="sec-title">What Success Looks Like</div>
+  <div class="sec-sub">The end state this strategy is designed to produce.</div>
+  <div class="sec-divider" style="background:var(--core)"></div>
+  <div class="success-grid">
+    <div class="success-card"><div class="success-icon">🏢</div><div class="success-text">Enterprises hold BDXN as part of their hiring budgets</div></div>
+    <div class="success-card"><div class="success-icon">👤</div><div class="success-text">Candidates stake BDXN to build credible, verified reputation</div></div>
+    <div class="success-card"><div class="success-icon">📈</div><div class="success-text">Token demand tied to hiring activity; not speculation</div></div>
+    <div class="success-card"><div class="success-icon">🔒</div><div class="success-text">Bondex positioned as the trust layer for talent</div></div>
+  </div>
+</div></section>
+
+<footer class="footer">
+  <div class="tagline">Proof, Not Claims.</div>
+  <p>BDXN Token Utility Strategy; Bondex 2026; <a href="https://bondex.app" target="_blank">bondex.app</a></p>
+  <p style="margin-top:4px">Confidential; Internal Strategy Document</p>
+</footer>
+
+<script>
+const core10=[
+{num:'01',title:'Hiring Fees',tag:'Revenue',detail:'Enterprises pay BDXN to complete hires through the platform. Creates <strong>recurring operational spend</strong> tied directly to hiring volume; not speculation. As the talent pool grows, hiring fee revenue compounds.',complexity:'medium',time:'6-8 wks',eng:'Requires smart contract for fee collection and distribution, integration with Bondex:Hire pipeline events, and a fiat-to-BDXN payment gateway for enterprise onboarding. Depends on ATS subscription flow being live first.'},
+{num:'02',title:'Job Listing Payments',tag:'Revenue',detail:'Companies pay BDXN to post and promote jobs across Web3.Career, Remote3, and Bondex App. Creates a <strong>consistent demand floor</strong>. Premium placement drives higher spend per posting.',complexity:'low',time:'3-4 wks',eng:'Extend existing job posting flow with BDXN payment option. Wallet connect on Web3.Career and Remote3 posting forms. Low risk; mostly frontend + payment service integration.'},
+{num:'03',title:'Reputation Staking',tag:'Trust',detail:'Both talent and employers stake BDXN to signal credibility and unlock higher trust tiers. Creates <strong>skin-in-the-game</strong> for both sides. Removes circulating supply while linking token value to professional credibility.',complexity:'high',time:'10-14 wks',eng:'Staking contract with tier logic, slashing conditions, and cooldown periods. Requires on-chain reputation score oracle, frontend staking UI, and backend sync between chain state and platform permissions. Most complex Core utility.'},
+{num:'04',title:'Verification Fees',tag:'Trust',detail:'Users pay BDXN to verify credentials, employment history, and professional qualifications. Creates <strong>micro-transaction demand</strong> that scales with user growth. Verified profiles are worth more to hiring managers.',complexity:'medium',time:'5-7 wks',eng:'Payment micro-transaction flow per verification type. Integrate with credential verification provider (post-Reclaim replacement). Need gas-efficient batching for multiple verifications in one session.'},
+{num:'05',title:'ATS Subscription',tag:'Revenue',detail:'Bondex:Hire dashboard access requires BDXN-denominated subscription. Creates <strong>predictable recurring demand</strong>. Companies budget for this like LinkedIn Recruiter; except spend flows through BDXN.',complexity:'medium',time:'6-8 wks',eng:'Subscription smart contract with monthly/annual billing cycles, grace periods, and seat-based pricing. Needs integration with existing Hire dashboard auth and a subscription management UI for enterprise admins.'},
+{num:'06',title:'Revenue Sharing',tag:'Lockup',detail:'Stakers earn proportional share of platform revenue. Creates a <strong>powerful lockup incentive</strong>; holding BDXN becomes income-generating. Aligns token holders with platform growth.',complexity:'high',time:'10-12 wks',eng:'Revenue distribution contract, epoch-based reward calculation, claim mechanism. Requires audited treasury contract and real-time revenue tracking from all fee sources. Security-critical; needs formal audit.'},
+{num:'07',title:'Referral Bounties',tag:'Growth',detail:'Successful referrals earn BDXN bounties (up to $20K equivalent per hire). Creates a <strong>decentralized recruiting army</strong> where every user is a potential recruiter with economic incentive.',complexity:'medium',time:'5-6 wks',eng:'Referral tracking system with attribution logic, bounty escrow contract, and payout triggers on confirmed hire events. Partially exists in current system; needs token payment layer on top.'},
+{num:'08',title:'Governance Voting',tag:'Governance',detail:'BDXN holders vote on platform decisions, treasury allocation, and feature prioritization. Creates <strong>lockup demand</strong> and community alignment.',complexity:'medium',time:'6-8 wks',eng:'Governance contract (Snapshot-style or on-chain). Proposal creation, voting periods, quorum logic, and execution. Can start with off-chain Snapshot and migrate to on-chain later to reduce initial complexity.'},
+{num:'09',title:'Premium Access',tag:'Utility',detail:'Advanced search, AI matching insights, profile analytics, and priority application placement gated behind BDXN. Creates <strong>utility-driven demand</strong> from power users on both sides.',complexity:'low',time:'3-4 wks',eng:'Feature flag system gated by BDXN balance or active subscription. Mostly frontend gating with balance check API. Low smart contract complexity; primary work is defining and shipping premium feature set.'},
+{num:'10',title:'Trust Collateral',tag:'Trust',detail:'BDXN locked as collateral backs professional claims and employer commitments. <strong>Trust needs collateral.</strong> This is what makes Bondex a trust economy; not just a job board.',complexity:'high',time:'12-16 wks',eng:'Collateral locking contract with conditional release logic, dispute resolution hooks, and reputation-linked collateral requirements. Depends on Reputation Staking being live. Most architecturally significant utility; defines the trust layer.'}
+];
+
+const entUtils=[
+{name:'Hiring Fees',tier:'core',desc:'Pay BDXN per successful hire. Primary revenue driver tied directly to hiring volume.'},
+{name:'Job Listing Payments',tier:'core',desc:'Post and promote jobs across Web3.Career, Remote3, and Bondex App with BDXN-denominated pricing.'},
+{name:'ATS Subscription',tier:'core',desc:'Bondex:Hire dashboard access via BDXN subscription for enterprise recruiting teams.'},
+{name:'Premium Job Placement',tier:'exp',desc:'Pay additional BDXN for featured listings, top-of-feed placement, and highlighted employer branding.'},
+{name:'Candidate Unlock Fees',tier:'exp',desc:'Pay BDXN to access detailed candidate profiles, contact information, and reputation data.'},
+{name:'Talent Pool Analytics',tier:'exp',desc:'BDXN-gated analytics dashboard showing market trends, salary benchmarks, and talent availability.'},
+{name:'Bulk Hiring Packages',tier:'exp',desc:'Volume discounts on BDXN hiring fees for enterprises with high-frequency recruitment needs.'},
+{name:'Employer Verification Badge',tier:'core',desc:'Companies stake BDXN to earn verified employer status, increasing trust with candidates.'},
+{name:'Priority Candidate Access',tier:'exp',desc:'Staked BDXN unlocks early access to top-rated candidates before general search.'},
+{name:'API Access Tiers',tier:'exp',desc:'Integrate Bondex talent data into existing HR systems via BDXN-denominated API subscription tiers.'},
+{name:'Sponsored Content',tier:'exp',desc:'Pay BDXN to promote employer brand content, culture posts, and team spotlights to targeted talent.'},
+{name:'White-Label Recruiting',tier:'fut',desc:'License Bondex recruiting infrastructure for internal use via BDXN-denominated agreements.'},
+{name:'Recruitment SLA Staking',tier:'fut',desc:'Employers stake BDXN as commitment to fair hiring practices, timely responses, and offer guarantees.'},
+{name:'Talent Pipeline Subscriptions',tier:'exp',desc:'Ongoing BDXN payments for curated candidate pipelines delivered to hiring teams on a recurring basis.'},
+{name:'Interview Scheduling Premium',tier:'exp',desc:'BDXN payment for AI-powered interview coordination and scheduling across time zones.'},
+{name:'Offer Letter Escrow',tier:'fut',desc:'Lock BDXN in escrow to back job offers; released upon candidate onboarding confirmation.'},
+{name:'Hiring Analytics Reports',tier:'exp',desc:'Detailed market intelligence and competitive hiring reports available for BDXN.'},
+{name:'Event Sponsorship',tier:'exp',desc:'Sponsor virtual hiring events and talent meetups with BDXN for brand visibility.'},
+{name:'Enterprise Governance Weight',tier:'exp',desc:'Staked BDXN gives enterprise accounts proportional voting power on platform direction.'},
+{name:'Compliance & Audit Tools',tier:'fut',desc:'BDXN-gated compliance tools for tracking hiring diversity, pay equity, and regulatory requirements.'},
+{name:'Multi-Seat Team Access',tier:'exp',desc:'BDXN pricing for adding multiple team members to a single enterprise Bondex:Hire account.'},
+{name:'Custom Integration Support',tier:'fut',desc:'Dedicated technical support and custom API integrations for enterprise clients denominated in BDXN.'}
+];
+
+const usrUtils=[
+{name:'Reputation Staking',tier:'core',desc:'Stake BDXN to build credibility. Higher stakes unlock trust badges, priority matching, and visibility boosts.'},
+{name:'Verification Fees',tier:'core',desc:'Pay BDXN to verify credentials, employment history, skills, and certifications on your profile.'},
+{name:'Revenue Sharing',tier:'core',desc:'Stake BDXN to earn proportional share of platform revenue from hiring fees and subscriptions.'},
+{name:'Referral Bounties',tier:'core',desc:'Earn BDXN bounties (up to $20K equivalent) for successful referrals that result in hires.'},
+{name:'Governance Voting',tier:'core',desc:'Stake BDXN to vote on platform decisions; feature roadmap, treasury allocation, and fee structures.'},
+{name:'Premium Access',tier:'core',desc:'Unlock advanced search, AI matching insights, profile analytics, and priority application placement.'},
+{name:'Trust Collateral',tier:'core',desc:'Lock BDXN to back professional claims. Trust collateral makes your profile credible to hiring managers.'},
+{name:'Endorsement Staking',tier:'exp',desc:'Stake BDXN when endorsing a colleague; putting economic weight behind your professional recommendation.'},
+{name:'Skill Badge Minting',tier:'exp',desc:'Pay BDXN to mint verified skill badges as on-chain credentials that travel across platforms.'},
+{name:'Profile Boost',tier:'exp',desc:'Pay BDXN for temporary visibility boosts that surface your profile to more recruiters.'},
+{name:'Learning & Certification',tier:'exp',desc:'Pay BDXN for platform-verified courses and certifications that enhance your professional profile.'},
+{name:'Content Creator Rewards',tier:'exp',desc:'Earn BDXN for publishing professional content that the community values.'},
+{name:'Community Challenge Prizes',tier:'exp',desc:'Win BDXN in seasonal challenges, hackathons, and skill-based competitions run by the platform.'},
+{name:'Ambassador Rewards',tier:'exp',desc:'Earn BDXN as a Bondex ambassador for driving user growth, content creation, and community building.'},
+{name:'Portfolio Showcase',tier:'exp',desc:'Pay BDXN for enhanced portfolio display with rich media, case studies, and interactive project showcases.'},
+{name:'Priority Application',tier:'exp',desc:'Pay BDXN to move your application to the top of the queue for competitive positions.'},
+{name:'Professional Score Tiers',tier:'exp',desc:'Stake BDXN to unlock higher professional score tiers with increasing platform benefits and visibility.'},
+{name:'Cross-Platform Reputation',tier:'fut',desc:'Port your Bondex reputation to other platforms via BDXN-backed credential proofs.'},
+{name:'Freelance Escrow',tier:'fut',desc:'Lock BDXN in escrow for freelance engagements; released upon deliverable completion.'},
+{name:'Token-Gated Communities',tier:'fut',desc:'Access exclusive professional communities, mentorship circles, and executive networks by holding BDXN.'},
+{name:'Salary Streaming',tier:'fut',desc:'Receive continuous BDXN salary payments streamed per-second for freelance and contract work.'}
+];
+
+// Render Core 10
+const cg=document.getElementById('coreGrid');
+core10.forEach(c=>{
+  const d=document.createElement('div');d.className='core-card';
+  const cx=c.complexity==='low'?'badge-lo':c.complexity==='medium'?'badge-md':'badge-hi';
+  const cl=c.complexity.charAt(0).toUpperCase()+c.complexity.slice(1);
+  d.innerHTML=`<div class="core-head"><div class="core-num mono">${c.num}</div><div class="core-name">${c.title}</div><div class="core-tag">${c.tag}</div><div class="core-arrow">▼</div></div><div class="core-detail"><div class="core-detail-inner">${c.detail}<div class="eng-row"><span class="eng-badge ${cx}"><span class="dot"></span>${cl}</span><span class="eng-badge badge-time">⏱ ${c.time}</span></div><div class="eng-note">${c.eng}</div></div></div>`;
+  d.onclick=()=>d.classList.toggle('open');cg.appendChild(d);
+});
+
+// Render utilities
+function rU(list,id,cls){const ct=document.getElementById(id);list.forEach(u=>{const d=document.createElement('div');d.className=`util-card ${cls}`;const tc=u.tier==='core'?'tier-core':u.tier==='exp'?'tier-exp':'tier-fut';const tl=u.tier==='core'?'Core':u.tier==='exp'?'Expansion':'Future';d.innerHTML=`<div class="util-head"><div class="util-dot"></div><div class="util-name">${u.name}</div><span class="util-tier ${tc}">${tl}</span><div class="util-arrow">▼</div></div><div class="util-body"><div class="util-body-inner">${u.desc}</div></div>`;d.onclick=()=>d.classList.toggle('open');ct.appendChild(d);})}
+rU(entUtils,'entList','ent-card');rU(usrUtils,'usrList','usr-card');
+
+function togglePanel(id){const p=document.getElementById('panel-'+id);p.classList.toggle('open');if(p.classList.contains('open'))setTimeout(()=>p.scrollIntoView({behavior:'smooth',block:'nearest'}),100)}
+</script>
+</body>
+</html>
